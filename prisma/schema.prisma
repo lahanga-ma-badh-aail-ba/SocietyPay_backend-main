@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+
+  // 🔑 1–1 relation (User owns the foreign key)
+  flatId    String?  @unique
+  flat      Flat?    @relation(fields: [flatId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([flatId])
+}
+
+model Flat {
+  id                 String   @id @default(uuid())
+  flatNumber         String   @unique
+  ownerName          String
+  ownerEmail         String
+  monthlyMaintenance Float
+
+  // 🔑 inverse side of 1–1 relation
+  user               User?
+
+  payments           Payment[]
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([flatNumber])
+  @@index([ownerEmail])
+}
+
+
+
+
+model MaintenanceMonth {
+  id        String    @id @default(uuid())
+  month     Int
+  year      Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  payments  Payment[]
+
+  @@unique([month, year])
+  @@index([month, year])
+}
+
+model Payment {
+  id                 String           @id @default(uuid())
+  flatId             String
+  maintenanceMonthId String
+  amount             Float
+  status             PaymentStatus    @default(PENDING)
+  paymentMode        PaymentMode?
+  transactionId      String?
+  paidAt             DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  upiResponse        Json?
+  upiTransactionId   String?
+  flat               Flat             @relation(fields: [flatId], references: [id], onDelete: Cascade)
+  maintenanceMonth   MaintenanceMonth @relation(fields: [maintenanceMonthId], references: [id], onDelete: Cascade)
+  receipt            Receipt?
+
+  @@unique([flatId, maintenanceMonthId])
+  @@index([flatId])
+  @@index([maintenanceMonthId])
+  @@index([status])
+  @@index([transactionId])
+  @@index([upiTransactionId])
+  @@index([transactionId], map: "idx_payment_transactionId")
+  @@index([upiTransactionId], map: "idx_payment_upiTransactionId")
+}
+
+model Receipt {
+  id            String   @id @default(uuid())
+  paymentId     String   @unique
+  receiptNumber String   @unique
+  pdfData       Bytes
+  emailSent     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([receiptNumber])
+  @@index([paymentId])
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum PaymentMode {
+  ONLINE
+  OFFLINE
+  UPI
+}
