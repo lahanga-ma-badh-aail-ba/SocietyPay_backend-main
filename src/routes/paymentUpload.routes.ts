@@ -1,5 +1,5 @@
 // routes/paymentUpload.ts
-import express from 'express';
+import express, { Request, Response } from 'express';
 import multer from 'multer';
 import { createClient } from '@supabase/supabase-js';
 
@@ -11,7 +11,11 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-router.post('/upload-payment', upload.single('file'), async (req, res) => {
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
+router.post('/upload-payment', upload.single('file'), async (req: MulterRequest, res: Response) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
