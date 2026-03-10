@@ -34,7 +34,7 @@ app.use(cookieParser());
 // ✅ CORS (Updated with exposedHeaders)
 app.use(
   cors({
-    origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000', 'http://192.168.1.10:8080', 'http://192.168.1.10:5173', 'https://society-pay.vercel.app' ],
+    origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000', 'http://192.168.1.10:8080', 'http://192.168.1.10:5173', 'https://society-pay.vercel.app','https://society-pay-frontend-main.vercel.app','https://harmony-pay.vercel.app' ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
