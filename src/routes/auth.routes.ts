@@ -6,7 +6,8 @@ import {
   getUserById,
   getProfile,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAdminContact
 } from "../controllers/auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { requireRole } from "../middleware/roleCheck.middleware";
@@ -19,6 +20,7 @@ router.post("/login", login);
 
 // Protected routes (require authentication)
 router.get("/profile", authMiddleware, getProfile);
+router.get('/contact', getAdminContact);
 
 // Admin only routes
 router.get("/users", authMiddleware, requireRole("ADMIN"), getAllUsers);

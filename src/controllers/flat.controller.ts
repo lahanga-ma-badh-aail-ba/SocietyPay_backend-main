@@ -8,7 +8,7 @@ import { createPendingPaymentForUser } from '../utils/payment.utils';
  * Create a flat (Admin only)
  */
 export const createFlat = async (req: AuthRequest, res: Response) => {
-  const { flatNumber, ownerName, ownerEmail, monthlyMaintenance } = req.body;
+  const { flatNumber, ownerName, ownerEmail, ownerPhone, monthlyMaintenance } = req.body;
 
   try {
     const flat = await prisma.flat.create({
@@ -16,6 +16,7 @@ export const createFlat = async (req: AuthRequest, res: Response) => {
         flatNumber,
         ownerName,
         ownerEmail,
+        ownerPhone: ownerPhone || null,
         monthlyMaintenance,
       },
     });
@@ -40,6 +41,7 @@ export const getAllFlats = async (req: AuthRequest, res: Response) => {
             id: true,
             name: true,
             email: true,
+            phone: true,
           },
         },
       },
@@ -59,58 +61,6 @@ export const getAllFlats = async (req: AuthRequest, res: Response) => {
  * Assign a flat to a user (Admin only)
  * Source of truth = User.flatId
  */
-// export const assignFlatToUser = async (req: AuthRequest, res: Response) => {
-//   const { userId, flatId } = req.body;
-
-//   try {
-//     // 1️⃣ Fetch user
-//     const user = await prisma.user.findUnique({
-//       where: { id: userId },
-//     });
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // 2️⃣ Fetch flat
-//     const flat = await prisma.flat.findUnique({
-//       where: { id: flatId },
-//     });
-
-//     if (!flat) {
-//       return res.status(404).json({ message: "Flat not found" });
-//     }
-
-//     // 3️⃣ Unassign previous flat (if any)
-//     await prisma.user.update({
-//       where: { id: userId },
-//       data: { flatId: null },
-//     });
-
-//     // 4️⃣ Assign flat to user
-//     await prisma.user.update({
-//       where: { id: userId },
-//       data: { flatId },
-//     });
-
-//     // 5️⃣ 🔥 UPDATE FLAT OWNER DETAILS (THIS WAS MISSING)
-//     const updatedFlat = await prisma.flat.update({
-//       where: { id: flatId },
-//       data: {
-//         ownerName: user.name,
-//         ownerEmail: user.email,
-//       },
-//     });
-
-//     res.json({
-//       message: "Flat assigned successfully",
-//       flat: updatedFlat,
-//     });
-//   } catch (error) {
-//     console.error("Assign flat error:", error);
-//     res.status(500).json({ message: "Failed to assign flat" });
-//   }
-// };
 
 export const assignFlatToUser = async (req: AuthRequest, res: Response) => {
   const { userId, flatId } = req.body;
@@ -168,6 +118,7 @@ export const assignFlatToUser = async (req: AuthRequest, res: Response) => {
       data: {
         ownerName: user.name,
         ownerEmail: user.email,
+        ownerPhone: user.phone || null,
       },
     });
 

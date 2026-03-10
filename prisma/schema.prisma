@@ -12,6 +12,7 @@ model User {
   email     String   @unique
   password  String
   name      String
+  phone     String?  // 🆕 User's phone number
   role      Role     @default(USER)
 
   // 🔑 1–1 relation (User owns the foreign key)
@@ -30,6 +31,7 @@ model Flat {
   flatNumber         String   @unique
   ownerName          String
   ownerEmail         String
+  ownerPhone     String?  // 🆕 User's phone number
   monthlyMaintenance Float
 
   // 🔑 inverse side of 1–1 relation
@@ -67,6 +69,7 @@ model Payment {
   status             PaymentStatus    @default(PENDING)
   paymentMode        PaymentMode?
   transactionId      String?
+  img                String?
   paidAt             DateTime?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -90,7 +93,6 @@ model Receipt {
   id            String   @id @default(uuid())
   paymentId     String   @unique
   receiptNumber String   @unique
-  pdfData       Bytes
   emailSent     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
