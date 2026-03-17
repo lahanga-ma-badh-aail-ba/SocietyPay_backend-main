@@ -79,8 +79,12 @@ export const exportPaymentsCSV = async (req: AuthRequest, res: Response): Promis
 
     const csvRows = payments.map((payment) => {
       const paidDate = payment.paidAt ? new Date(payment.paidAt) : null;
-      const date = paidDate ? paidDate.toLocaleDateString('en-IN') : 'N/A';
-      const time = paidDate ? paidDate.toLocaleTimeString('en-IN') : 'N/A';
+      const date = paidDate
+        ? paidDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })
+        : 'N/A';
+      const time = paidDate
+        ? paidDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })
+        : 'N/A';
       
       // Find the user associated with this flat
       const user = flatUserMap.get(payment.flatId);
